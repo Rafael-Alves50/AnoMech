@@ -75,7 +75,7 @@ public sealed class FruP5FulgentBladeScenario : IScenario
     {
         pandora = world.SpawnEnemy(new EnemySpawnConfig(
             BNpcBaseId: BNpcBaseId.Pandora,
-            NameId: 0,
+            NameId: BNpcNameId.Pandora,
             Level: Level,
             Targetable: true,
             EnemyList: EnemyListMode.Always,
