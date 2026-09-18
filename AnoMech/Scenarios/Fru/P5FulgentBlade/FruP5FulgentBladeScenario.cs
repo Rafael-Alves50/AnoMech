@@ -30,10 +30,10 @@ public sealed class FruP5FulgentBladeScenario : IScenario
     // Four bars in each exawave: dark/light on AB, then dark/light on the 45-degree CD axis.
     private static readonly WaveDef[] WaveDefs =
     [
-        new(0f,                         isLight: false),
-        new(MathF.PI,                   isLight: true),
-        new(MathF.PI + MathF.PI / 4f,   isLight: false),
-        new(MathF.PI / 4f,              isLight: true),
+        new(0f,                         IsLight: false),
+        new(MathF.PI,                   IsLight: true),
+        new(MathF.PI + MathF.PI / 4f,   IsLight: false),
+        new(MathF.PI / 4f,              IsLight: true),
     ];
 
     private SimWorld world = null!;
