@@ -9,6 +9,7 @@ using static AnoMech.Scenarios.Fru.FruConstants;
 namespace AnoMech.Scenarios.Fru.P5FulgentBlade;
 
 // FRU P5 Fulgent Blade / Exalines.
+// Development branch: first in-game validation pass.
 //
 // The scenario deliberately ends after Fulgent Blade. It uses the live FRU
 // action IDs and the six real base-line geometry; each base line launches
