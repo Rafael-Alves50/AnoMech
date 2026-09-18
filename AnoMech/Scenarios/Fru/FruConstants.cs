@@ -33,18 +33,13 @@ public static class FruConstants
     {
         public const float ArenaRadius = 22f;
 
-        // WCGH FRU-Sim P5 wave width. The visual bar is 140y long, so inside a
-        // 22y-radius arena we can treat it as infinite across its long axis.
-        public const float ExalineWidth = 11.855f;
-        public const int ExalineHits = 7;
+        // Path of Light/Darkness is a 5y-deep, 80y-wide rectangle. Subsequent
+        // exaline hits advance by exactly 5y every 2s.
+        public const float ExalineStep = 5f;
+        public const float ExalineActiveRadius = 21f;
+        public const float ExalineHitboxMargin = 0.35f;
 
-        // Controller anchors from WCGH FRU-Sim.
-        public static readonly (float X, float Z)[] ControllerAnchors =
-        [
-            (0f, 17f),
-            (0f, -17f),
-            (17f, 0f),
-            (-17f, 0f),
-        ];
+        // Offset of the six-line octagram's centre from the arena centre: 5*sqrt(2).
+        public const float StarCenterRadius = 7.0710678f;
     }
 }
