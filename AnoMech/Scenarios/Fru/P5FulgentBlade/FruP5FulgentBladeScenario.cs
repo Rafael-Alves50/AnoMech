@@ -55,6 +55,7 @@ public sealed class FruP5FulgentBladeScenario : IScenario
 
         // The six line actors exist from mechanic start but are dormant/invisible
         // until their SharedGroup animation is kicked at t=8.
+        // Spawn early so the EObj SharedGroups are fully attached before t=8 reveal.
         world.Events.Add(0.4f, SpawnLineVisuals);
         world.Events.Add(0.5f, () => pandora?.Cast(ActionId.FulgentBlade, castSeconds: 6f));
 
