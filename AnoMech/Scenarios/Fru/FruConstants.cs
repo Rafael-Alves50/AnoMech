@@ -15,6 +15,11 @@ public static class FruConstants
         public const uint Pandora = 0x45AF; // P5 boss
     }
 
+    public static class BNpcNameId
+    {
+        public const uint Pandora = 13561;
+    }
+
     public static class ActionId
     {
         public const uint FulgentBlade = 40306;
