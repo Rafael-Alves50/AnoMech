@@ -7,6 +7,7 @@ using AnoMech.Core.Map;
 using AnoMech.Core.Native;
 using AnoMech.Core.SimObjects;
 using AnoMech.Scenarios;
+using AnoMech.Scenarios.Fru.P5FulgentBlade;
 using AnoMech.Scenarios.Top.P2PartySynergy;
 using AnoMech.Scenarios.Top.P5Delta;
 using AnoMech.Scenarios.Top.P5Omega;
@@ -72,6 +73,7 @@ public sealed class Game : IDisposable
         opcodeUpdater = new OpcodeUpdater();
         Scenarios = new IScenario[]
         {
+            new FruP5FulgentBladeScenario(),
             new UmadP2ForsakenScenario(),
             new UmadP3BlackHoleScenario(),
             new UmadP4KefkaSaysScenario(),
