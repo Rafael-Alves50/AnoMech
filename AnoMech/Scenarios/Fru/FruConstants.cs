@@ -20,6 +20,12 @@ public static class FruConstants
         public const uint Pandora = 13561;
     }
 
+    public static class EObjId
+    {
+        // FRU P5 Fulgent Blade line / octagram edge EventObject.
+        public const uint FulgentBladeLine = 2014199;
+    }
+
     public static class ActionId
     {
         public const uint FulgentBlade = 40306;
