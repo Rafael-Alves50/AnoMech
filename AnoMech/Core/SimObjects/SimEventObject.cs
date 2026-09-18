@@ -179,6 +179,16 @@ public unsafe class SimEventObject : ISimObject, IPositioned
     // VisibleState and 0 (the engine default / "hidden" for gated SGs).
     public void SetVisible(bool visible) => SetState(visible ? visibleState : (ushort)0);
 
+    // Plays one or more SharedGroup timeline animations on this EObj. Each bit
+    // selects a timeline index in the attached SharedGroup. FRU Fulgent Blade
+    // uses this for the base-line reveal (0x2), progressive glow (0x10), and
+    // arrow/travel cue (0x8).
+    public void PlayAnimation(uint bitmask)
+    {
+        if (obj == null) return;
+        ((EventObject*)obj)->PlayAnimation(0, bitmask, 0);
+    }
+
     public virtual void Tick(float deltaSeconds)
     {
         // Re-sync stored Position/Rotation from native — catches any
