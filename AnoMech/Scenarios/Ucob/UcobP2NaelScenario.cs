@@ -20,7 +20,7 @@ public sealed class UcobP2NaelScenario : IScenario
     private SimWorld world = null!;
     private SimParty party = null!;
     private SimEnemy? nael;
-    private Random rng = null!;
+    private Rng rng = Rng.Detached;
 
     private static readonly uint[][] QuotePairs =
     [
@@ -132,7 +132,7 @@ public sealed class UcobP2NaelScenario : IScenario
     {
         world.Events.Add(at, () =>
         {
-            var target = (PartyRole)rng.Next(2, 8);
+            var target = (PartyRole)2 + rng.Next(6);
             nael?.Cast(ActionId.FireballP2, castSeconds: 0f, targetId: party.Get(target)?.GameObjectId);
             world.Events.Add(5.1f, () =>
             {
@@ -156,7 +156,7 @@ public sealed class UcobP2NaelScenario : IScenario
             var offset = at + 1.9f + i * 0.5f;
             world.Events.Add(offset, () =>
             {
-                var role = (PartyRole)rng.Next(0, 8);
+                var role = (PartyRole)rng.Next(8);
                 nael?.Cast(ActionId.Iceball, castSeconds: 0f, targetId: party.Get(role)?.GameObjectId);
             });
         }
@@ -164,9 +164,9 @@ public sealed class UcobP2NaelScenario : IScenario
         // Chain lightning hits two random players; 5y separation is required.
         world.Events.Add(at + 3.8f, () =>
         {
-            var a = (PartyRole)rng.Next(0, 8);
+            var a = (PartyRole)rng.Next(8);
             PartyRole b;
-            do b = (PartyRole)rng.Next(0, 8); while (b == a);
+            do b = (PartyRole)rng.Next(8); while (b == a);
             nael?.Cast(ActionId.ChainLightning, castSeconds: 0f);
             world.Events.Add(1.0f, () =>
             {
@@ -181,7 +181,7 @@ public sealed class UcobP2NaelScenario : IScenario
         {
             world.Events.Add(at + 4.8f, () =>
             {
-                var doom = Enumerable.Range(0, 8).OrderBy(_ => rng.Next()).Take(3).Select(i => (PartyRole)i).ToArray();
+                var doom = Enumerable.Range(0, 8).OrderBy(_ => rng.Next(int.MaxValue)).Take(3).Select(i => (PartyRole)i).ToArray();
                 for (var i = 0; i < doom.Length; i++)
                 {
                     var role = doom[i];
@@ -229,7 +229,7 @@ public sealed class UcobP2NaelScenario : IScenario
                 UcobScenarioUtil.KillInDonut(party, nael?.Position ?? Vector3.Zero, Geometry.DynamoInner, Geometry.DynamoOuter, "Quote: Lunar Dynamo (IN)");
                 break;
             case ActionId.ThermionicBeam:
-                var stack = (PartyRole)rng.Next(0, 8);
+                var stack = (PartyRole)rng.Next(8);
                 nael?.Cast(action, castSeconds: 0f, targetId: party.Get(stack)?.GameObjectId);
                 UcobScenarioUtil.ResolveStack(party, stack, Geometry.ThermionicBeamRadius, 8, "Quote: Thermionic Beam stack failed");
                 break;
@@ -250,7 +250,7 @@ public sealed class UcobP2NaelScenario : IScenario
         // Five drakes occupy five of eight inter/cardinal directions. The relative arrangement
         // is randomized each run; the three NAUR bait positions stay at the standard edge spots.
         var start = rng.Next(8);
-        var dirs = Enumerable.Range(0, 8).OrderBy(_ => rng.Next()).Take(5).ToArray();
+        var dirs = Enumerable.Range(0, 8).OrderBy(_ => rng.Next(int.MaxValue)).Take(5).ToArray();
         var dragons = new List<SimEnemy?>();
         for (var i = 0; i < 5; i++)
         {
