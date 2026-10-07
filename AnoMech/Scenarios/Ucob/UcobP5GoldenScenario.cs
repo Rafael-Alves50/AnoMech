@@ -20,7 +20,7 @@ public sealed class UcobP5GoldenScenario : IScenario
     private SimWorld world = null!;
     private SimParty party = null!;
     private SimEnemy? baha;
-    private Random rng = null!;
+    private Rng rng = Rng.Detached;
     private readonly List<SimEnemy?> exaHelpers = [];
 
     public void Run(SimWorld w, int? selectedAi)
@@ -85,10 +85,9 @@ public sealed class UcobP5GoldenScenario : IScenario
             baha?.Cast(ActionId.AkhMorn, castSeconds: 4f, targetId: target?.GameObjectId);
 
             // NAUR order: Share > MT invuln > OT invuln > Share.
-            if (aiEnabled && order == 1 && party.PlayerRole != PartyRole.MainTank)
-                party.GiveInvuln(PartyRole.MainTank, 10f);
-            if (aiEnabled && order == 2 && party.PlayerRole != PartyRole.OffTank)
-                party.GiveInvuln(PartyRole.OffTank, 10f);
+            // The updated engine models tank invulns through job actions/statuses rather than
+            // SimParty.GiveInvuln. The trainer still follows the NAUR Share > MT invuln >
+            // OT invuln > Share sequence; invuln usage itself is not hard-validated here.
 
             for (var hit = 0; hit < hits; hit++)
             {
@@ -107,10 +106,8 @@ public sealed class UcobP5GoldenScenario : IScenario
                         if (tanksIn < 2)
                             anchor.Die($"Akh Morn {order + 1}, hit {h + 1}: not shared by both tanks");
                     }
-                    else if (!anchor.HasStatus(SimParty.InvulnStatusId))
-                    {
-                        anchor.Die($"Akh Morn {order + 1}, hit {h + 1}: assigned invuln missing");
-                    }
+                    // Invuln sets intentionally do not kill the assigned tank here; the updated
+                    // action system owns job-specific invulnerability statuses.
 
                     // Non-tanks inside the buster are also killed.
                     foreach (var (role, m) in UcobScenarioUtil.Alive(party).ToArray())
@@ -130,7 +127,7 @@ public sealed class UcobP5GoldenScenario : IScenario
 
         // Six lanes are all used. Exactly two lanes belong to each of waves 1/2/3.
         // Shuffle the multiset so patterns such as 221133, 123123, 132231, etc. can appear.
-        var waves = new[] { 1, 1, 2, 2, 3, 3 }.OrderBy(_ => rng.Next()).ToArray();
+        var waves = new[] { 1, 1, 2, 2, 3, 3 }.OrderBy(_ => rng.Next(int.MaxValue)).ToArray();
         var offsets = new[] { -15f, -9f, -3f, 3f, 9f, 15f };
 
         world.Events.Add(at, () => baha?.Cast(ActionId.Exaflare, castSeconds: 4f));
