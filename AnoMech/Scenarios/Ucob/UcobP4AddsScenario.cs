@@ -22,10 +22,12 @@ public sealed class UcobP4AddsScenario : IScenario
     private SimEnemy? twin;
     private SimEnemy? nael;
     private readonly Random rng = new();
+    private bool? _firstQuoteWasIn;
 
     public void Run(SimWorld w, int? selectedAi)
     {
         world = w; party = w.Party;
+        _firstQuoteWasIn = null;
 
         // NAUR: MT Twin, OT Nael; bosses held between 1/3, slightly NE.
         twin = UcobScenarioUtil.Spawn(w, BNpcBaseId.Twintania, new Vector3(-4,0,-5), 0, true);
@@ -49,7 +51,7 @@ public sealed class UcobP4AddsScenario : IScenario
         PlummetAndClaw(4f);
         LiquidHells(7f);
         HatchTwister(14f);
-        QuoteTwister(19f);
+        QuoteTwister(19f, firstLoop: true);
         Megaflare(27f);
         DoubleTankbuster(35f);
 
@@ -57,7 +59,7 @@ public sealed class UcobP4AddsScenario : IScenario
         PlummetAndClaw(43f);
         LiquidHells(49f);
         HatchTwister(56f);
-        QuoteTwister(61f);
+        QuoteTwister(61f, firstLoop: false);
         DoubleTankbuster(70f);
         Megaflare(81f);
     }
@@ -89,31 +91,87 @@ public sealed class UcobP4AddsScenario : IScenario
 
     private void HatchTwister(float at)
     {
-        world.Events.Add(at, () => twin?.Cast(ActionId.Generate, castSeconds: 3f));
-        world.Events.Add(at + 1.1f, () => twin?.Cast(ActionId.Twister, castSeconds: 2f));
-        world.Events.Add(at + 3.1f, () => UcobP3.SpawnTwisters(world, party, "Adds: Twister"));
+        // Exactly three of the four DPS receive Hatch. D4 is the flex:
+        // if D4 is unmarked, D4 leaves; if D4 is marked, D4 fills the missing D1/D2/D3 link.
+        var dps = new[] { PartyRole.MeleeDpsA, PartyRole.MeleeDpsB, PartyRole.PhysRangedDps, PartyRole.CasterDps };
+        var marked = dps.OrderBy(_ => rng.Next()).Take(3).ToArray();
+        var unmarked = dps.Except(marked).Single();
 
-        world.Events.Add(at + 3.2f, () =>
+        var assigned = new Dictionary<PartyRole, Vector3>
         {
-            // In Adds, hatch targets still need a neurolink. Use the south link as the training reference.
-            var target = (PartyRole)rng.Next(2, 8);
-            var m = party.Get(target);
-            var link = new Vector3(0,0,9);
-            world.SpawnEventObject(new EventObjectSpawnConfig { EObjId = EObjId.Neurolink, Placement = new Placement(link,0), SpawnVisible = true, TargetableStatus = 1, Radius = 1f });
-            if (m != null && UcobScenarioUtil.HorizontalDistance(m.Position, link) > 2.5f)
-                m.Die("Adds: Hatch not intercepted in Neurolink");
+            [PartyRole.MeleeDpsA] = new Vector3(-8,0,5),
+            [PartyRole.MeleeDpsB] = new Vector3(8,0,5),
+            [PartyRole.PhysRangedDps] = new Vector3(0,0,-8),
+        };
+        if (marked.Contains(PartyRole.CasterDps))
+            assigned[PartyRole.CasterDps] = assigned[unmarked];
+
+        foreach (var p in assigned.Values.Distinct())
+            world.SpawnEventObject(new EventObjectSpawnConfig { EObjId = EObjId.Neurolink, Placement = new Placement(p,0), SpawnVisible = true, TargetableStatus = 1, Radius = 1f });
+
+        world.Events.Add(at, () => twin?.Cast(ActionId.Generate, castSeconds: 3f));
+
+        if (world.Party.PlayerRole != PartyRole.CasterDps && selectedBot(marked, PartyRole.CasterDps, out var d4Pos))
+            party.Get(PartyRole.CasterDps)?.MoveTo(d4Pos, 9f);
+
+        foreach (var role in marked)
+            if (role != party.PlayerRole && assigned.TryGetValue(role, out var p))
+                party.Get(role)?.MoveTo(p, 9f);
+
+        // Front links resolve Hatch before Twister. Back/N link baits Twister outside first.
+        world.Events.Add(at + 3.0f, () =>
+        {
+            foreach (var role in marked)
+            {
+                if (!assigned.TryGetValue(role, out var link) || link.Z < 0) continue;
+                var m = party.Get(role);
+                if (m != null && UcobScenarioUtil.HorizontalDistance(m.Position, link) > 2.5f)
+                    m.Die("Adds: front Hatch missed Neurolink");
+            }
         });
+
+        world.Events.Add(at + 3.1f, () => twin?.Cast(ActionId.Twister, castSeconds: 2f));
+        world.Events.Add(at + 5.1f, () => UcobP3.SpawnTwisters(world, party, "Adds: Twister"));
+        world.Events.Add(at + 5.5f, () =>
+        {
+            foreach (var role in marked)
+            {
+                if (!assigned.TryGetValue(role, out var link) || link.Z >= 0) continue;
+                var m = party.Get(role);
+                if (m != null && UcobScenarioUtil.HorizontalDistance(m.Position, link) > 2.5f)
+                    m.Die("Adds: back Hatch missed Neurolink after Twister");
+            }
+        });
+
+        bool selectedBot(PartyRole[] targets, PartyRole role, out Vector3 pos)
+        {
+            if (targets.Contains(role) && assigned.TryGetValue(role, out pos)) return true;
+            pos = UcobScenarioUtil.Polar(19, 180);
+            return true;
+        }
     }
 
-    private void QuoteTwister(float at)
+    private void QuoteTwister(float at, bool firstLoop)
     {
-        var quote = rng.Next(4) switch
+        // Adds has exactly four legal three-part quotes. The second loop always
+        // starts with the opposite In/Out family from the first loop.
+        var inQuotes = new[]
         {
-            0 => new uint[] { ActionId.LunarDynamo, ActionId.IronChariot },
-            1 => new uint[] { ActionId.LunarDynamo, ActionId.ThermionicBeam },
-            2 => new uint[] { ActionId.ThermionicBeam, ActionId.IronChariot },
-            _ => new uint[] { ActionId.RavenDive, ActionId.LunarDynamo },
+            new uint[] { ActionId.LunarDynamo, ActionId.RavenDive, ActionId.ThermionicBeam },
+            new uint[] { ActionId.LunarDynamo, ActionId.IronChariot, ActionId.RavenDive },
         };
+        var outQuotes = new[]
+        {
+            new uint[] { ActionId.IronChariot, ActionId.ThermionicBeam, ActionId.RavenDive },
+            new uint[] { ActionId.IronChariot, ActionId.RavenDive, ActionId.ThermionicBeam },
+        };
+
+        // Deterministic family flip per run: first loop random family, second loop opposite.
+        if (_firstQuoteWasIn == null)
+            _firstQuoteWasIn = rng.Next(2) == 0;
+        var useIn = firstLoop ? _firstQuoteWasIn.Value : !_firstQuoteWasIn.Value;
+        var pool = useIn ? inQuotes : outQuotes;
+        var quote = pool[rng.Next(pool.Length)];
 
         for (var i = 0; i < quote.Length; i++)
         {
@@ -127,7 +185,7 @@ public sealed class UcobP4AddsScenario : IScenario
                 else if (a == ActionId.RavenDive) UcobScenarioUtil.ResolveSpread(party, Enumerable.Range(0,8).Select(x => (PartyRole)x), 6f, "Adds quote: spread");
             });
         }
-        world.Events.Add(at + 0.2f, () => UcobP3.SpawnTwisters(world, party, "Adds quote: Twister"));
+        world.Events.Add(at + quote.Length * 3.1f + 0.2f, () => UcobP3.SpawnTwisters(world, party, "Adds quote: Twister"));
     }
 
     private void Megaflare(float at)
