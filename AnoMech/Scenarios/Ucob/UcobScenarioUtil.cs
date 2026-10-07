@@ -128,20 +128,13 @@ internal static class UcobScenarioUtil
     public static void MoveBots(SimParty party, params (PartyRole role, Vector3 pos)[] moves)
     {
         foreach (var (role, pos) in moves)
-        {
-            if (role == party.PlayerRole) continue;
             party.Get(role)?.MoveTo(pos, 9f);
-        }
     }
 
     public static void MoveAllBots(SimParty party, Vector3 pos)
     {
         for (var i = 0; i < 8; i++)
-        {
-            var role = (PartyRole)i;
-            if (role == party.PlayerRole) continue;
-            party.Get(role)?.MoveTo(pos, 9f);
-        }
+            party.Get((PartyRole)i)?.MoveTo(pos, 9f);
     }
 
     public static Vector3 Polar(float radius, float degrees)
