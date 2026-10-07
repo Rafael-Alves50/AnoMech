@@ -21,12 +21,13 @@ public sealed class UcobP4AddsScenario : IScenario
     private SimParty party = null!;
     private SimEnemy? twin;
     private SimEnemy? nael;
-    private readonly Random rng = new();
+    private Random rng = null!;
     private bool? _firstQuoteWasIn;
 
     public void Run(SimWorld w, int? selectedAi)
     {
-        world = w; party = w.Party;
+        world = w;
+        rng = w.Rng; party = w.Party;
         _firstQuoteWasIn = null;
 
         // NAUR: MT Twin, OT Nael; bosses held between 1/3, slightly NE.
