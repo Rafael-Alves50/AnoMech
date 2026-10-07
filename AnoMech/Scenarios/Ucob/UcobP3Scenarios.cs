@@ -330,15 +330,19 @@ public sealed class UcobP3HeavensfallScenario : IScenario
     {
         var party = world.Party;
         var rng = new Random();
-        var naelDeg = rng.Next(8) * 45f;
-        var naelPos = UcobScenarioUtil.Polar(21, naelDeg);
+        // Heavensfall always spawns the trio adjacent along one random edge, with
+        // all 6 boss orders possible. Nael can therefore be left, middle, or right.
+        var anchor = rng.Next(8) * 45f;
+        var slots = new[] { anchor - 22.5f, anchor, anchor + 22.5f };
+        var order = new[] { BNpcBaseId.BahamutPrime, BNpcBaseId.Nael, BNpcBaseId.Twintania }.OrderBy(_ => rng.Next()).ToArray();
+        var posById = new Dictionary<uint, Vector3>();
+        for (var i = 0; i < 3; i++)
+            posById[order[i]] = UcobScenarioUtil.Polar(21, slots[i]);
 
-        // Twin/Bahamut can be same-side or opposite-side relative to Nael; both geometries are legal.
-        var sameSide = rng.Next(2) == 0;
-        var twinDeg = naelDeg + (sameSide ? 90 : 90);
-        var bahaDeg = naelDeg + (sameSide ? 135 : -90);
-        var twinPos = UcobScenarioUtil.Polar(21, twinDeg);
-        var bahaPos = UcobScenarioUtil.Polar(21, bahaDeg);
+        var naelPos = posById[BNpcBaseId.Nael];
+        var twinPos = posById[BNpcBaseId.Twintania];
+        var bahaPos = posById[BNpcBaseId.BahamutPrime];
+        var naelDeg = MathF.Atan2(naelPos.X, -naelPos.Z) * 180f / MathF.PI;
 
         var baha = UcobScenarioUtil.Spawn(world, BNpcBaseId.BahamutPrime, Vector3.Zero, 0, true);
         UcobScenarioUtil.Spawn(world, BNpcBaseId.Nael, naelPos, UcobScenarioUtil.HeadingTo(naelPos, Vector3.Zero), false);
@@ -352,7 +356,6 @@ public sealed class UcobP3HeavensfallScenario : IScenario
         world.Events.Add(9.5f, () =>
         {
             UcobP3.ResolveDive(party, twinPos, Vector3.Zero, Geometry.DiveHalfWidthTwinNael, "Heavensfall: Twisting Dive");
-            UcobP3.ResolveDive(party, naelPos, Vector3.Zero, Geometry.DiveHalfWidthTwinNael, "Heavensfall: Lunar Dive");
             UcobP3.ResolveDive(party, bahaPos, Vector3.Zero, Geometry.DiveHalfWidthBahamut, "Heavensfall: Megaflare Dive");
         });
 
@@ -471,25 +474,29 @@ public sealed class UcobP3GrandOctetScenario : IScenario
     {
         var party = world.Party;
         var rng = new Random();
-        var bahaIndex = rng.Next(8);
+        // Grand Octet occupies all eight fixed card/intercardinal slots exactly once:
+        // Bahamut, Nael, Twin, and the five elemental drakes.
+        var slotPermutation = Enumerable.Range(0, 8).OrderBy(_ => rng.Next()).ToArray();
+        var bahaIndex = slotPermutation[0];
+        var naelIndex = slotPermutation[1];
+        var twinIndex = slotPermutation[2];
         var bahaDeg = bahaIndex * 45f;
+        var naelDeg = naelIndex * 45f;
         var diveDirection = (bahaIndex & 1) != 0 ? -1 : 1; // intercardinal -> CW, cardinal -> CCW
 
         var bahaPos = UcobScenarioUtil.Polar(21, bahaDeg);
-        var naelDeg = (bahaDeg + (rng.Next(2) == 0 ? 90 : 180)) % 360f;
         var naelPos = UcobScenarioUtil.Polar(21, naelDeg);
-        var twinPos = UcobScenarioUtil.Polar(21, bahaDeg + 180f);
+        var twinPos = UcobScenarioUtil.Polar(21, twinIndex * 45f);
 
         var baha = UcobScenarioUtil.Spawn(world, BNpcBaseId.BahamutPrime, Vector3.Zero, 0, true);
         var nael = UcobScenarioUtil.Spawn(world, BNpcBaseId.Nael, naelPos, 0, false);
         var twin = UcobScenarioUtil.Spawn(world, BNpcBaseId.Twintania, twinPos, 0, false);
 
         var drakeIds = new[] { BNpcBaseId.Firehorn, BNpcBaseId.Iceclaw, BNpcBaseId.Thunderwing, BNpcBaseId.TailOfDarkness, BNpcBaseId.FangOfLight };
-        var available = Enumerable.Range(0, 8).Where(i => i != bahaIndex && MathF.Abs(i * 45f - naelDeg) > 1f).OrderBy(_ => rng.Next()).Take(5).ToArray();
         var drakes = new List<(SimEnemy? enemy, Vector3 pos)>();
         for (var i = 0; i < 5; i++)
         {
-            var pos = UcobScenarioUtil.Polar(24, available[i] * 45f);
+            var pos = UcobScenarioUtil.Polar(24, slotPermutation[i + 3] * 45f);
             drakes.Add((UcobScenarioUtil.Spawn(world, drakeIds[i], pos, 0, false), pos));
         }
 
