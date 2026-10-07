@@ -18,6 +18,7 @@ using AnoMech.Scenarios.Umad.P3BlackHole;
 using AnoMech.Scenarios.Umad.P4KefkaSays;
 using AnoMech.Scenarios.Umad.P5Exaflares;
 using AnoMech.Scenarios.Uwu.UltimatePredation;
+using AnoMech.Scenarios.Ucob;
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using FFXIVClientStructs.FFXIV.Client.Game;
@@ -82,7 +83,18 @@ public sealed class Game : IDisposable
             new TopP5SigmaScenario(),
             new TopP5OmegaScenario(),
             new TopP6WaveCannon2Scenario(),
-            new UltimatePredationScenario()
+            new UltimatePredationScenario(),
+            new UcobP1TwintaniaScenario(),
+            new UcobP2NaelScenario(),
+            new UcobP3CoreScenario(),
+            new UcobP3QuickmarchScenario(),
+            new UcobP3BlackfireScenario(),
+            new UcobP3FellruinScenario(),
+            new UcobP3HeavensfallScenario(),
+            new UcobP3TenstrikeScenario(),
+            new UcobP3GrandOctetScenario(),
+            new UcobP4AddsScenario(),
+            new UcobP5GoldenScenario()
         };
 
         // Derive the zone tree from the flat registry (first-appearance order).
