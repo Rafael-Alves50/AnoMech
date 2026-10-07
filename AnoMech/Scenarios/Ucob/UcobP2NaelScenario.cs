@@ -20,7 +20,7 @@ public sealed class UcobP2NaelScenario : IScenario
     private SimWorld world = null!;
     private SimParty party = null!;
     private SimEnemy? nael;
-    private readonly Random rng = new();
+    private Random rng = null!;
 
     private static readonly uint[][] QuotePairs =
     [
@@ -37,6 +37,7 @@ public sealed class UcobP2NaelScenario : IScenario
     public void Run(SimWorld w, int? selectedAi)
     {
         world = w;
+        rng = w.Rng;
         party = w.Party;
         nael = UcobScenarioUtil.Spawn(w, BNpcBaseId.Nael, Vector3.Zero, MathF.PI, true);
         nael?.SetTarget(party.Get(PartyRole.MainTank), follow: false);
