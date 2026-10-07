@@ -20,12 +20,13 @@ public sealed class UcobP5GoldenScenario : IScenario
     private SimWorld world = null!;
     private SimParty party = null!;
     private SimEnemy? baha;
-    private readonly Random rng = new();
+    private Random rng = null!;
     private readonly List<SimEnemy?> exaHelpers = [];
 
     public void Run(SimWorld w, int? selectedAi)
     {
         world = w;
+        rng = w.Rng;
         party = w.Party;
         exaHelpers.Clear();
 
