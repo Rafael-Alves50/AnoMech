@@ -156,7 +156,7 @@ public sealed class UcobP3QuickmarchScenario : IScenario
         world.Events.Add(12.3f, () => UcobScenarioUtil.ResolveSpread(party, Enumerable.Range(0, 8).Select(i => (PartyRole)i), 10f, "Quickmarch: Megaflare spread"));
         world.Events.Add(14.8f, () =>
         {
-            var stack = (PartyRole)rng.Next(0, 8);
+            var stack = (PartyRole)rng.Next(8);
             UcobScenarioUtil.ResolveStack(party, stack, 5f, 3, "Quickmarch: Megaflare stack");
         });
 
@@ -236,7 +236,7 @@ public sealed class UcobP3BlackfireScenario : IScenario
 
         world.Events.Add(16f, () =>
         {
-            var stackTargets = Enumerable.Range(0, 8).OrderBy(_ => rng.Next()).Take(4).Select(i => (PartyRole)i).ToArray();
+            var stackTargets = Enumerable.Range(0, 8).OrderBy(_ => rng.Next(int.MaxValue)).Take(4).Select(i => (PartyRole)i).ToArray();
             var target = stackTargets[0];
             UcobScenarioUtil.ResolveStack(party, target, 5f, 4, "Blackfire: Megaflare stack");
         });
@@ -334,7 +334,7 @@ public sealed class UcobP3HeavensfallScenario : IScenario
         // all 6 boss orders possible. Nael can therefore be left, middle, or right.
         var anchor = rng.Next(8) * 45f;
         var slots = new[] { anchor - 22.5f, anchor, anchor + 22.5f };
-        var order = new[] { BNpcBaseId.BahamutPrime, BNpcBaseId.Nael, BNpcBaseId.Twintania }.OrderBy(_ => rng.Next()).ToArray();
+        var order = new[] { BNpcBaseId.BahamutPrime, BNpcBaseId.Nael, BNpcBaseId.Twintania }.OrderBy(_ => rng.Next(int.MaxValue)).ToArray();
         var posById = new Dictionary<uint, Vector3>();
         for (var i = 0; i < 3; i++)
             posById[order[i]] = UcobScenarioUtil.Polar(21, slots[i]);
@@ -386,7 +386,7 @@ public sealed class UcobP3HeavensfallScenario : IScenario
 
         world.Events.Add(17f, () =>
         {
-            var stack = (PartyRole)rng.Next(0, 8);
+            var stack = (PartyRole)rng.Next(8);
             UcobScenarioUtil.ResolveStack(party, stack, 4f, 8, "Heavensfall: Fireball");
         });
 
@@ -419,7 +419,7 @@ public sealed class UcobP3TenstrikeScenario : IScenario
         world.Events.Add(1f, () => baha?.Cast(ActionId.TenstrikeTrio, castSeconds: 4f));
 
         // Six hatch targets in two waves; two players remain untargeted.
-        var shuffled = Enumerable.Range(0, 8).OrderBy(_ => rng.Next()).Select(i => (PartyRole)i).ToArray();
+        var shuffled = Enumerable.Range(0, 8).OrderBy(_ => rng.Next(int.MaxValue)).Select(i => (PartyRole)i).ToArray();
         var hatchTargets = shuffled.Take(6).ToArray();
         var links = new[] { new Vector3(0,0,-8), new Vector3(-8,0,5), new Vector3(8,0,5) };
         foreach (var p in links)
@@ -476,7 +476,7 @@ public sealed class UcobP3GrandOctetScenario : IScenario
         var rng = world.Rng;
         // Grand Octet occupies all eight fixed card/intercardinal slots exactly once:
         // Bahamut, Nael, Twin, and the five elemental drakes.
-        var slotPermutation = Enumerable.Range(0, 8).OrderBy(_ => rng.Next()).ToArray();
+        var slotPermutation = Enumerable.Range(0, 8).OrderBy(_ => rng.Next(int.MaxValue)).ToArray();
         var bahaIndex = slotPermutation[0];
         var naelIndex = slotPermutation[1];
         var twinIndex = slotPermutation[2];
@@ -525,7 +525,7 @@ public sealed class UcobP3GrandOctetScenario : IScenario
         sources.Add((bahaPos, Geometry.DiveHalfWidthBahamut, "Megaflare Dive"));
         sources.Add((twinPos, Geometry.DiveHalfWidthTwinNael, "Twisting Dive"));
 
-        var baitOrder = Enumerable.Range(0, 8).OrderBy(_ => rng.Next()).Select(i => (PartyRole)i).ToArray();
+        var baitOrder = Enumerable.Range(0, 8).OrderBy(_ => rng.Next(int.MaxValue)).Select(i => (PartyRole)i).ToArray();
         for (var i = 0; i < sources.Count; i++)
         {
             var n = i;
