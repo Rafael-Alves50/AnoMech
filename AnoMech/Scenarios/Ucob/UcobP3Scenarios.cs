@@ -127,7 +127,7 @@ public sealed class UcobP3QuickmarchScenario : IScenario
     public void Run(SimWorld world, int? selectedAi)
     {
         var party = world.Party;
-        var rng = new Random();
+        var rng = world.Rng;
         var north = rng.Next(8) * 45f;
         var bahaPos = UcobScenarioUtil.Polar(21, north);
         var naelPos = UcobScenarioUtil.Polar(21, north + 120f);
@@ -188,7 +188,7 @@ public sealed class UcobP3BlackfireScenario : IScenario
     public void Run(SimWorld world, int? selectedAi)
     {
         var party = world.Party;
-        var rng = new Random();
+        var rng = world.Rng;
         var north = rng.Next(8) * 45f;
         var naelPos = UcobScenarioUtil.Polar(21, north);
         var baha = UcobScenarioUtil.Spawn(world, BNpcBaseId.BahamutPrime, Vector3.Zero, 0, true);
@@ -259,7 +259,7 @@ public sealed class UcobP3FellruinScenario : IScenario
     public void Run(SimWorld world, int? selectedAi)
     {
         var party = world.Party;
-        var rng = new Random();
+        var rng = world.Rng;
         var north = rng.Next(8) * 45f;
         var bahaPos = UcobScenarioUtil.Polar(17, north);
         var naelPos = UcobScenarioUtil.Polar(11, north + 180f);
@@ -329,7 +329,7 @@ public sealed class UcobP3HeavensfallScenario : IScenario
     public void Run(SimWorld world, int? selectedAi)
     {
         var party = world.Party;
-        var rng = new Random();
+        var rng = world.Rng;
         // Heavensfall always spawns the trio adjacent along one random edge, with
         // all 6 boss orders possible. Nael can therefore be left, middle, or right.
         var anchor = rng.Next(8) * 45f;
@@ -414,7 +414,7 @@ public sealed class UcobP3TenstrikeScenario : IScenario
     public void Run(SimWorld world, int? selectedAi)
     {
         var party = world.Party;
-        var rng = new Random();
+        var rng = world.Rng;
         var baha = UcobScenarioUtil.Spawn(world, BNpcBaseId.BahamutPrime, Vector3.Zero, 0, true);
         world.Events.Add(1f, () => baha?.Cast(ActionId.TenstrikeTrio, castSeconds: 4f));
 
@@ -473,7 +473,7 @@ public sealed class UcobP3GrandOctetScenario : IScenario
     public void Run(SimWorld world, int? selectedAi)
     {
         var party = world.Party;
-        var rng = new Random();
+        var rng = world.Rng;
         // Grand Octet occupies all eight fixed card/intercardinal slots exactly once:
         // Bahamut, Nael, Twin, and the five elemental drakes.
         var slotPermutation = Enumerable.Range(0, 8).OrderBy(_ => rng.Next()).ToArray();
