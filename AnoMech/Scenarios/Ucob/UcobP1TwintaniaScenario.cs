@@ -113,7 +113,7 @@ public sealed class UcobP1TwintaniaScenario : IScenario
         world.Events.Add(at, () =>
         {
             var candidates = new[] { PartyRole.RegenHealer, PartyRole.ShieldHealer, PartyRole.MeleeDpsA, PartyRole.MeleeDpsB, PartyRole.PhysRangedDps, PartyRole.CasterDps };
-            var target = candidates[Random.Shared.Next(candidates.Length)];
+            var target = candidates[world.Rng.Next(candidates.Length)];
             twin?.Cast(ActionId.Fireball, castSeconds: 0f, targetId: party.Get(target)?.GameObjectId);
             world.Events.Add(4.8f, () => UcobScenarioUtil.ResolveStack(party, target, Geometry.FireballRadius, minPlayers, "Fireball stack failed"));
         });
@@ -142,7 +142,7 @@ public sealed class UcobP1TwintaniaScenario : IScenario
         {
             twin?.Cast(ActionId.Generate, castSeconds: 3f);
             var candidates = new[] { PartyRole.PhysRangedDps, PartyRole.CasterDps, PartyRole.MeleeDpsA, PartyRole.MeleeDpsB };
-            var target = candidates[Random.Shared.Next(candidates.Length)];
+            var target = candidates[world.Rng.Next(candidates.Length)];
             var targetMember = party.Get(target);
             world.Events.Add(3.1f, () =>
             {
