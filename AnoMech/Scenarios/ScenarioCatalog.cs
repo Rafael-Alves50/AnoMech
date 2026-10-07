@@ -4,6 +4,7 @@ using AnoMech.Scenarios.Top.P5Delta;
 using AnoMech.Scenarios.Top.P5Omega;
 using AnoMech.Scenarios.Top.P5Sigma;
 using AnoMech.Scenarios.Top.P6WaveCannon2;
+using AnoMech.Scenarios.Ucob;
 using AnoMech.Scenarios.Ucob.P5Exaflares;
 using AnoMech.Scenarios.Umad;
 using AnoMech.Scenarios.Umad.P1TeleTrouncing;
@@ -40,6 +41,17 @@ public static class ScenarioCatalog
         new TopP6WaveCannon2Scenario(),
         new UltimatePredationScenario(),
         new UltimateSuppressionScenario(),
+        new UcobP1TwintaniaScenario(),
+        new UcobP2NaelScenario(),
+        new UcobP3CoreScenario(),
+        new UcobP3QuickmarchScenario(),
+        new UcobP3BlackfireScenario(),
+        new UcobP3FellruinScenario(),
+        new UcobP3HeavensfallScenario(),
+        new UcobP3TenstrikeScenario(),
+        new UcobP3GrandOctetScenario(),
+        new UcobP4AddsScenario(),
+        new UcobP5GoldenScenario(),
         new UcobP5ExaflaresScenario(),
     ];
 }
