@@ -113,7 +113,18 @@ public sealed class UcobP2NaelScenario : IScenario
         });
 
         if (outer)
-            world.Events.Add(at - 1.0f, () => NaurClockSpots(at));
+            world.Events.Add(MathF.Max(0f, at - 1.0f), () =>
+            {
+                UcobScenarioUtil.MoveBots(party,
+                    (PartyRole.MainTank, UcobScenarioUtil.Polar(9, 337.5f)),
+                    (PartyRole.OffTank, UcobScenarioUtil.Polar(9, 22.5f)),
+                    (PartyRole.RegenHealer, UcobScenarioUtil.Polar(18, 337.5f)),
+                    (PartyRole.ShieldHealer, UcobScenarioUtil.Polar(18, 22.5f)),
+                    (PartyRole.MeleeDpsA, UcobScenarioUtil.Polar(9, 292.5f)),
+                    (PartyRole.MeleeDpsB, UcobScenarioUtil.Polar(9, 67.5f)),
+                    (PartyRole.PhysRangedDps, UcobScenarioUtil.Polar(18, 292.5f)),
+                    (PartyRole.CasterDps, UcobScenarioUtil.Polar(18, 67.5f)));
+            });
     }
 
     private void DragonCycle(float at, bool fireOut, int cycle)
