@@ -21,7 +21,7 @@ public sealed class UcobP4AddsScenario : IScenario
     private SimParty party = null!;
     private SimEnemy? twin;
     private SimEnemy? nael;
-    private Random rng = null!;
+    private Rng rng = Rng.Detached;
     private bool? _firstQuoteWasIn;
 
     public void Run(SimWorld w, int? selectedAi)
@@ -95,7 +95,7 @@ public sealed class UcobP4AddsScenario : IScenario
         // Exactly three of the four DPS receive Hatch. D4 is the flex:
         // if D4 is unmarked, D4 leaves; if D4 is marked, D4 fills the missing D1/D2/D3 link.
         var dps = new[] { PartyRole.MeleeDpsA, PartyRole.MeleeDpsB, PartyRole.PhysRangedDps, PartyRole.CasterDps };
-        var marked = dps.OrderBy(_ => rng.Next()).Take(3).ToArray();
+        var marked = dps.OrderBy(_ => rng.Next(int.MaxValue)).Take(3).ToArray();
         var unmarked = dps.Except(marked).Single();
 
         var assigned = new Dictionary<PartyRole, Vector3>
@@ -194,7 +194,7 @@ public sealed class UcobP4AddsScenario : IScenario
         world.Events.Add(at, () =>
         {
             // All NAUR stacks are resolved in arena center.
-            var stack = (PartyRole)rng.Next(0, 8);
+            var stack = (PartyRole)rng.Next(8);
             UcobScenarioUtil.ResolveStack(party, stack, 5f, 4, "Adds: Megaflare stack");
             UcobScenarioUtil.ResolveSpread(party, Enumerable.Range(0,8).Select(x => (PartyRole)x), 10f, "Adds: Megaflare spread");
         });
