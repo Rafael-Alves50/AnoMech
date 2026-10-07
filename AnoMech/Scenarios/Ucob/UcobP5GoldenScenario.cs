@@ -177,10 +177,11 @@ public sealed class UcobP5GoldenScenario : IScenario
         for (var i = 0; i < order.Length; i++)
         {
             var role = order[i];
+            var first = i == 0;
             world.Events.Add(at + i * 1.2f, () =>
             {
                 var target = party.Get(role);
-                baha?.Cast(i == 0 ? ActionId.Enrage : ActionId.EnrageAOE, castSeconds: i == 0 ? 10f : 0f, targetId: target?.GameObjectId);
+                baha?.Cast(first ? ActionId.Enrage : ActionId.EnrageAOE, castSeconds: first ? 10f : 0f, targetId: target?.GameObjectId);
                 target?.Die("Golden Bahamut enrage");
             });
         }
